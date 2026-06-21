@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Echat - Secure Real-time Messaging</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(15, 23, 42, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Abstract glowing circles in the background */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        body::before {
+            top: 15%;
+            left: 20%;
+            background: #8b5cf6;
+        }
+
+        body::after {
+            bottom: 15%;
+            right: 20%;
+            background: #3b82f6;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 10;
+            transform: translateY(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            position: relative;
+        }
+
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(6px);
+        }
+
+        .brand-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #ffffff;
+        }
+
+        .brand-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .brand-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            outline: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow), 
+                        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-wrapper input:focus + label {
+            color: var(--accent);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .auth-footer a:hover {
+            color: var(--text-main);
+            text-decoration: underline;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast-notification">
+        <span id="toast-message">Incorrect details</span>
+    </div>
+
+    <div class="login-container">
+        <div class="brand-header">
+            <div class="brand-icon">
+                <!-- Telegram-like modern paper plane icon -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.54-1.09 6.25-.13.72-.4 1.15-.65 1.18-.56.05-1.01-.38-1.56-.74-.86-.57-1.35-.92-2.19-1.47-.97-.64-.34-1 .21-1.57.14-.15 2.64-2.42 2.69-2.63.01-.03.01-.13-.05-.18-.06-.05-.15-.03-.21-.02-.09.02-1.58 1.01-4.47 2.96-.42.29-.8.43-1.15.42-.38-.01-1.12-.22-1.67-.4-.67-.22-1.21-.34-1.16-.72.03-.2.3-.41.83-.62 3.25-1.42 5.42-2.35 6.51-2.8 3.1-1.28 3.74-1.5 4.16-1.51.09 0 .3.02.43.13.11.09.14.22.15.31-.01.07.01.21 0 .28z"/>
+                </svg>
+            </div>
+            <h1>Echat</h1>
+            <p>Sign in to your Echat account</p>
+        </div>
+
+        <form id="login-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="username" name="username" required autocomplete="username" placeholder="e.g. alex_smith">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">
+                <span>Sign In</span>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const toast = document.getElementById('toast-notification');
+        const toastMessage = document.getElementById('toast-message');
+
+        function showToast(message, isSuccess = false) {
+            toastMessage.textContent = message;
+            if (isSuccess) {
+                toast.classList.add('success');
+            } else {
+                toast.classList.remove('success');
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+            
+            const formData = new FormData(form);
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('{% url "login" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('Welcome back! Redirecting...', true);
+                    setTimeout(() => {
+                        window.location.href = '{% url "index" %}';
+                    }, 1000);
+                } else {
+                    showToast(result.error || 'Authentication failed');
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
+            } catch (error) {
+                showToast('A network error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>

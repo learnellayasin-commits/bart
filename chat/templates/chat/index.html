@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echat | Telegram Clone</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body data-user-id="{{ request.user.id }}" data-username="{{ request.user.username }}" data-user-name="{{ request.user.get_full_name|default:request.user.username }}">
+
+    <!-- Main App Layout -->
+    <div class="app-layout">
+        
+        <!-- Sidebar Panel -->
+        <aside class="sidebar" id="sidebar-panel">
+            <header class="sidebar-header">
+                <div class="header-top">
+                    <div class="menu-btn-container">
+                        <button class="icon-btn" id="main-menu-btn" title="Menu">
+                            <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu" id="main-dropdown-menu">
+                            <button id="menu-new-group"><svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> New Group</button>
+                            <button id="menu-contacts"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.67-5.33-4-8-4z"/></svg> Contacts</button>
+                            <button id="menu-settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38-1.03.7-1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Settings</button>
+                            <a href="{% url 'logout' %}" id="menu-logout"><svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg> Log Out</a>
+                        </div>
+                    </div>
+                    <div class="search-bar-container">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                            <input type="text" id="search-input" placeholder="Search users..." autocomplete="off">
+                            <button id="clear-search-btn" class="clear-btn" style="display: none;">✕</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Search Results / Directory -->
+            <div class="search-results-panel" id="search-results-container" style="display: none;">
+                <div class="panel-section-title">Global Users</div>
+                <div class="results-list" id="search-results-list">
+                    <!-- Dynamic search items -->
+                </div>
+                <div id="search-empty-state" class="search-empty" style="display: none;">
+                    No users found matching your search.
+                </div>
+            </div>
+
+            <!-- Normal Chat List -->
+            <div class="chat-list-panel" id="chat-list-container">
+                <div class="chat-list" id="active-chats-list">
+                    <!-- Dynamic chats -->
+                    <div class="chats-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div id="chats-empty-state" class="chats-empty" style="display: none;">
+                    <h3>No conversations yet</h3>
+                    <p>Search for a user in the bar above to start a direct message or create a group from the menu.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area" id="chat-window">
+            
+            <!-- Default Welcome Dashboard (no active chat) -->
+            <div class="welcome-dashboard" id="welcome-dashboard">
+                <div class="welcome-content">
+                    <div class="welcome-logo">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.82-.77 4.54-1.09 6.25-.13.72-.4 1.15-.65 1.18-.56.05-1.01-.38-1.56-.74-.86-.57-1.35-.92-2.19-1.47-.97-.64-.34-1 .21-1.57.14-.15 2.64-2.42 2.69-2.63.01-.03.01-.13-.05-.18-.06-.05-.15-.03-.21-.02-.09.02-1.58 1.01-4.47 2.96-.42.29-.8.43-1.15.42-.38-.01-1.12-.22-1.67-.4-.67-.22-1.21-.34-1.16-.72.03-.2.3-.41.83-.62 3.25-1.42 5.42-2.35 6.51-2.8 3.1-1.28 3.74-1.5 4.16-1.51.09 0 .3.02.43.13.11.09.14.22.15.31-.01.07.01.21 0 .28z"/>
+                        </svg>
+                    </div>
+                    <h2>Welcome to Echat</h2>
+                    <p>Select a chat from the sidebar or search for users to start messaging in real-time.</p>
+                </div>
+            </div>
+
+            <!-- Active Chat Interface -->
+            <div class="active-chat-wrapper" id="active-chat-wrapper" style="display: none;">
+                <!-- Chat Header -->
+                <header class="chat-header">
+                    <div class="header-left">
+                        <button class="icon-btn back-btn" id="mobile-back-btn" title="Back to chats">
+                            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </button>
+                        <div class="avatar" id="header-avatar" style="background-color: var(--accent);">
+                            <span class="initials" id="header-initials">AB</span>
+                        </div>
+                        <div class="chat-meta">
+                            <h3 id="header-chat-name">Select Chat</h3>
+                            <span class="status-indicator" id="header-status">offline</span>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <button class="icon-btn" id="view-info-btn" title="Chat Info">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Messages Container -->
+                <div class="messages-container" id="messages-body">
+                    <!-- Message bubbles injected dynamically -->
+                </div>
+
+                <!-- Typers Indicator -->
+                <div class="typing-indicator-bar" id="typing-indicator-bar">
+                    <span id="typing-text">Bob is typing...</span>
+                </div>
+
+                <!-- Input Footer -->
+                <footer class="chat-footer">
+                    <form id="message-form" class="input-form">
+                        <button type="button" class="icon-btn" id="emoji-panel-btn" title="Emoji">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 6 15.5 6 14 6.67 14 7.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 6 8.5 6 7 6.67 7 7.5 7.67 9 8.5 9zm3.5 5.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                        </button>
+                        <div class="textarea-wrapper">
+                            <input type="text" id="message-input" placeholder="Write a message..." autocomplete="off">
+                        </div>
+                        <button type="submit" class="send-btn" id="send-message-btn" title="Send message">
+                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </button>
+                    </form>
+                </footer>
+            </div>
+        </main>
+        
+        <!-- Info Sidebar (Right drawer) -->
+        <aside class="info-sidebar" id="info-sidebar">
+            <header class="info-header">
+                <h3>User Info</h3>
+                <button class="icon-btn close-info-btn" id="close-info-btn">✕</button>
+            </header>
+            <div class="info-body">
+                <div class="info-avatar-wrapper">
+                    <div class="avatar large-avatar" id="info-avatar" style="background-color: var(--accent);">
+                        <span class="initials" id="info-initials">AB</span>
+                    </div>
+                </div>
+                <h2 id="info-name">Name</h2>
+                <p class="info-username" id="info-username">@username</p>
+                <div class="info-section">
+                    <label>Bio</label>
+                    <p class="info-bio-text" id="info-bio">No bio set.</p>
+                </div>
+                <div class="info-section" id="info-actions-section" style="border-top: 1px solid var(--border-color); padding: 1.25rem 0; width: 100%; display: none;">
+                    <button class="btn btn-primary" id="drawer-add-contact-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Add to Contacts
+                    </button>
+                </div>
+                <div class="info-section group-members-section" id="info-group-members-section" style="display: none;">
+                    <label>Group Members</label>
+                    <ul class="members-list" id="info-members-list">
+                        <!-- Group members -->
+                    </ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modals Layer -->
+    
+    <!-- New Group Modal -->
+    <div class="modal-overlay" id="group-modal">
+        <div class="modal-container">
+            <header class="modal-header">
+                <h2>Create New Group</h2>
+                <button class="close-modal-btn" id="close-group-modal">✕</button>
+            </header>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="group-name-input">Group Name</label>
+                    <input type="text" id="group-name-input" placeholder="e.g. Project Echat Team" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Select Members</label>
+                    <div class="members-selector-list" id="group-members-selector">
+                        <!-- Load active DM contacts or search results -->
+                        <div class="selector-empty">No direct contacts available. Add contacts by searching them in the main screen and opening a chat first.</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-group-btn">Cancel</button>
+                <button class="btn btn-primary" id="create-group-btn" disabled>Create Group</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-container">
+            <header class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-modal-btn" id="close-settings-modal">✕</button>
+            </header>
+            <div class="modal-body">
+                <div class="settings-profile-preview">
+                    <div class="avatar large-avatar" id="settings-avatar-preview" style="background-color: var(--accent);">
+                        <span class="initials" id="settings-initials-preview">ME</span>
+                    </div>
+                    <div class="profile-details">
+                        <h3 id="settings-username-display">@username</h3>
+                        <p>Customize your profile card</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-first-name">First Name</label>
+                    <input type="text" id="settings-first-name" placeholder="First Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-last-name">Last Name</label>
+                    <input type="text" id="settings-last-name" placeholder="Last Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-bio">Bio</label>
+                    <textarea id="settings-bio" placeholder="Add a few lines about yourself..." rows="3"></textarea>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-settings-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-settings-btn">Save Changes</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Contacts Modal -->
+    <div class="modal-overlay" id="contacts-modal">
+        <div class="modal-container">
+            <header class="modal-header">
+                <h2>Contacts</h2>
+                <button class="close-modal-btn" id="close-contacts-modal">✕</button>
+            </header>
+            <div class="modal-body">
+                <div class="add-contact-section" style="margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
+                    <label for="contact-username-input" style="display: block; font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 0.5rem;">Add Contact by Username</label>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <input type="text" id="contact-username-input" placeholder="Enter username (e.g. bob)" style="flex: 1; padding: 0.75rem 0.85rem; border-radius: 10px; border: 1px solid var(--border-color); background-color: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.9rem;" autocomplete="off">
+                        <button class="btn btn-primary" id="add-contact-btn" style="padding: 0 1.25rem;">Add</button>
+                    </div>
+                    <div id="add-contact-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; display: none;"></div>
+                    <div id="add-contact-success" style="color: var(--success); font-size: 0.8rem; margin-top: 0.5rem; display: none;">Contact added!</div>
+                </div>
+                
+                <label style="display: block; font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 0.5rem;">My Contacts</label>
+                <div class="contacts-scroll-list" id="contacts-list-container" style="border: 1px solid var(--border-color); border-radius: 10px; background-color: var(--bg-primary); max-height: 220px; overflow-y: auto; display: flex; flex-direction: column;">
+                    <div class="selector-empty">Your contacts list is empty. Add users by typing their username above.</div>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" id="close-contacts-btn">Close</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- CSRF Helper -->
+    {% csrf_token %}
+
+    <!-- Link JS -->
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
