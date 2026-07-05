@@ -59,3 +59,11 @@ When deploying this project to **Render**, use the following configuration:
   ```bash
   daphne echat_project.asgi:application --port $PORT --bind 0.0.0.0
   ```
+
+---
+
+## Live Deployment
+
+The application is deployed and available live at:
+👉 **[https://bart-bosm.onrender.com](https://bart-bosm.onrender.com)**
+
