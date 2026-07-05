@@ -140,3 +140,10 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/'
 
+# CSRF Trusted Origins for Render Deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://bart-bosm.onrender.com',
+    'https://*.onrender.com',
+]
+
+
