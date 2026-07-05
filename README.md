@@ -53,12 +53,13 @@ When deploying this project to **Render**, use the following configuration:
 - **Environment**: Python
 - **Build Command**: 
   ```bash
-  pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --no-input
+  pip install -r requirements.txt && python manage.py collectstatic --no-input
   ```
 - **Start Command**:
   ```bash
-  daphne echat_project.asgi:application --port $PORT --bind 0.0.0.0
+  python manage.py migrate && daphne echat_project.asgi:application --port $PORT --bind 0.0.0.0
   ```
+
 
 ---
 
